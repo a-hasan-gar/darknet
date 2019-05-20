@@ -1040,18 +1040,18 @@ void draw_detections_cv_v3(mat_cv* mat, detection *dets, int num, float thresh, 
                     //cvResetImageROI(copy_img);
 
                     cv::rectangle(*show_img, pt1, pt2, color, width, 8, 0);
-                    if (ext_output)
-                        printf("\t(left_x: %4.0f   top_y: %4.0f   width: %4.0f   height: %4.0f)\n",
-                        (float)left, (float)top, b.w*show_img->cols, b.h*show_img->rows);
-                    else
-                        printf("\n");
-
                     cv::rectangle(*show_img, pt_text_bg1, pt_text_bg2, color, width, 8, 0);
                     cv::rectangle(*show_img, pt_text_bg1, pt_text_bg2, color, CV_FILLED, 8, 0);    // filled
                     cv::Scalar black_color = CV_RGB(0, 0, 0);
                     cv::putText(*show_img, labelstr, pt_text, cv::FONT_HERSHEY_COMPLEX_SMALL, font_size, black_color, 2 * font_size, CV_AA);
                     // cv::FONT_HERSHEY_COMPLEX_SMALL, cv::FONT_HERSHEY_SIMPLEX
                 }
+
+                if (ext_output)
+                    printf("\t(left_x: %4.0f   top_y: %4.0f   width: %4.0f   height: %4.0f)\n",
+                    (float)left, (float)top, b.w*show_img->cols, b.h*show_img->rows);
+                else
+                    printf("\n");
             }
         }
         if (ext_output) {
