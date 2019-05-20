@@ -891,12 +891,35 @@ bool point_in_polygon(const vector<PT> &polygon, PT p) {
     return fabs(fabs(sum) - 2*PI) < EPS;
 }
 
+static std::vector<PT> roi_points;
+
+void initialize_roi_points()
+{
+    if (!roi_points.empty()) return;
+
+    std::ifstream roi_file("roi.txt");
+    if (roi_file.is_open()) {
+        while (!roi_file.eof()) {
+            PT p;
+            roi_file >> p.x >> p.y;
+            roi_points.push_back(p);
+        }
+
+        roi_file.close();
+    }
+    else throw std::logic_error("There are no roi.txt file");
+
+    // printf("ROI POINTS: %d\n", roi_points.size());
+    for (PT p : roi_points) printf("%f %f\n", p.x, p.y);
+}
+
 
 // ====================================================================
 // Draw Detection
 // ====================================================================
 void draw_detections_cv_v3(mat_cv* mat, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, int ext_output)
 {
+    initialize_roi_points();
     try {
         cv::Mat *show_img = mat;
         int i, j;
