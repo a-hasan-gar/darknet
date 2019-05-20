@@ -911,8 +911,8 @@ void initialize_roi_points()
     }
     else throw std::logic_error("There are no roi.txt file");
 
-    // printf("ROI POINTS: %d\n", roi_points.size());
-    // for (PT p : roi_points) printf("%f %f\n", p.x, p.y);
+    printf("ROI points: %d\n", (int) roi_points.size());
+    for (PT p : roi_points) printf("%f %f\n", p.x, p.y);
 }
 
 
