@@ -38,8 +38,13 @@ include/
 share/
 
 # Result files
+darknet
+log.txt
 out.avi
 predictions.jpg
 
 # Tests files
 tests/
+
+# ROI related
+roi.txt
