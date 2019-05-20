@@ -853,45 +853,7 @@ void save_cv_jpg(mat_cv *img_src, const char *name)
 // Read points from a file that create (hopefully) simple polygon as ROI.
 // Bounding boxes will be shown only if they are strictly inside the ROI.
 
-const float PI = acos(-1.0);
-const float EPS = 1e-6;
-
-struct PT {
-    float x, y;
-    PT() {}
-    PT(float x, float y) : x(x), y(y) {}
-    PT(const PT &a, const PT &b) : x(b.x - a.x), y(b.y - a.y) {}
-    PT operator+ (const PT &p) const { return PT(x + p.x, y + p.y); }
-    PT operator- (const PT &p) const { return PT(x - p.x, y - p.y); }
-};
-
-float dot(PT p, PT q) { return p.x * q.x + p.y * q.y; }
-float dist2(PT p, PT q) { return dot(p - q, p - q); }
-float cross(PT p, PT q) { return p.x * q.y - p.y * q.x; }
-
-bool is_ccw(PT p, PT q, PT r) { return cross(PT(p, q), PT(p, r)) > 0; }
-
-float get_angle(PT a, PT o, PT b) { // return AOB in rad
-    PT oa = PT(o, a), ob = PT(o, b);
-    return acos(dot(oa, ob) / sqrt(dist2(oa, PT(0, 0)) * dist2(ob, PT(0, 0))));
-}
-
-bool point_in_polygon(const std::vector<PT> &polygon, PT p) {
-    float sum = 0;
-    for (int i = 0; i < (int) polygon.size(); i++) {
-        int next_idx = (i+1) % polygon.size();
-        float angle = get_angle(polygon[i], p, polygon[next_idx]);
-
-        if (is_ccw(p, polygon[i], polygon[(i+1)%polygon.size()]))
-            sum += angle;
-        else
-            sum -= angle;
-    }
-
-    return fabs(fabs(sum) - 2*PI) < EPS;
-}
-
-static std::vector<PT> roi_points;
+static std::vector<cv::Point> roi_points;
 
 void initialize_roi_points()
 {
@@ -900,11 +862,11 @@ void initialize_roi_points()
     std::ifstream roi_file("roi.txt");
     if (roi_file.is_open()) {
         while (true) {
-            PT p;
-            roi_file >> p.x >> p.y;
+            float x, y;
+            roi_file >> x >> y;
             if (roi_file.fail()) break;
 
-            roi_points.push_back(p);
+            roi_points.push_back(cv::Point(x, y));
         }
 
         roi_file.close();
@@ -912,7 +874,7 @@ void initialize_roi_points()
     else throw std::logic_error("There are no roi.txt file");
 
     printf("ROI points: %d\n", (int) roi_points.size());
-    for (PT p : roi_points) printf("%f %f\n", p.x, p.y);
+    for (cv::Point p : roi_points) printf("%d %d\n", p.x, p.y);
 }
 
 
@@ -928,6 +890,9 @@ void draw_detections_cv_v3(mat_cv* mat, detection *dets, int num, float thresh, 
         if (!show_img) return;
         static int frame_id = 0;
         frame_id++;
+
+        // draw ROI border as polylines
+        cv::polylines(*show_img, roi_points, true, cv::Scalar(0, 255, 255), 2, cv::LINE_AA);
 
         for (i = 0; i < num; ++i) {
             char labelstr[4096] = { 0 };
@@ -1002,7 +967,7 @@ void draw_detections_cv_v3(mat_cv* mat, detection *dets, int num, float thresh, 
                 //int b_height = bot - top;
                 //sprintf(labelstr, "%d x %d - w: %d, h: %d", b_x_center, b_y_center, b_width, b_height);
 
-                if (point_in_polygon(roi_points, PT(b_x_center, b_y_center))) {
+                if (cv::pointPolygonTest(roi_points, cv::Point(b_x_center, b_y_center), false) >= 0) {
                     float const font_size = show_img->rows / 1000.F;
                     cv::Size const text_size = cv::getTextSize(labelstr, cv::FONT_HERSHEY_COMPLEX_SMALL, font_size, 1, 0);
                     cv::Point pt1, pt2, pt_text, pt_text_bg1, pt_text_bg2;
@@ -1040,18 +1005,18 @@ void draw_detections_cv_v3(mat_cv* mat, detection *dets, int num, float thresh, 
                     //cvResetImageROI(copy_img);
 
                     cv::rectangle(*show_img, pt1, pt2, color, width, 8, 0);
-                    if (ext_output)
-                        printf("\t(left_x: %4.0f   top_y: %4.0f   width: %4.0f   height: %4.0f)\n",
-                        (float)left, (float)top, b.w*show_img->cols, b.h*show_img->rows);
-                    else
-                        printf("\n");
-
                     cv::rectangle(*show_img, pt_text_bg1, pt_text_bg2, color, width, 8, 0);
                     cv::rectangle(*show_img, pt_text_bg1, pt_text_bg2, color, CV_FILLED, 8, 0);    // filled
                     cv::Scalar black_color = CV_RGB(0, 0, 0);
                     cv::putText(*show_img, labelstr, pt_text, cv::FONT_HERSHEY_COMPLEX_SMALL, font_size, black_color, 2 * font_size, CV_AA);
                     // cv::FONT_HERSHEY_COMPLEX_SMALL, cv::FONT_HERSHEY_SIMPLEX
                 }
+
+                if (ext_output)
+                    printf("\t(left_x: %4.0f   top_y: %4.0f   width: %4.0f   height: %4.0f)\n",
+                    (float)left, (float)top, b.w*show_img->cols, b.h*show_img->rows);
+                else
+                    printf("\n");
             }
         }
         if (ext_output) {
