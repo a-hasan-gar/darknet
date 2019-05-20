@@ -876,7 +876,7 @@ float get_angle(PT a, PT o, PT b) { // return AOB in rad
     return acos(dot(oa, ob) / sqrt(dist2(oa, PT(0, 0)) * dist2(ob, PT(0, 0))));
 }
 
-bool point_in_polygon(const vector<PT> &polygon, PT p) {
+bool point_in_polygon(const std::vector<PT> &polygon, PT p) {
     float sum = 0;
     for (int i = 0; i < (int) polygon.size(); i++) {
         int next_idx = (i+1) % polygon.size();
@@ -910,7 +910,7 @@ void initialize_roi_points()
     else throw std::logic_error("There are no roi.txt file");
 
     // printf("ROI POINTS: %d\n", roi_points.size());
-    for (PT p : roi_points) printf("%f %f\n", p.x, p.y);
+    // for (PT p : roi_points) printf("%f %f\n", p.x, p.y);
 }
 
 
