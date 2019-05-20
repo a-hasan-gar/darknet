@@ -994,60 +994,62 @@ void draw_detections_cv_v3(mat_cv* mat, detection *dets, int num, float thresh, 
                 if (top < 0) top = 0;
                 if (bot > show_img->rows - 1) bot = show_img->rows - 1;
 
-                //int b_x_center = (left + right) / 2;
-                //int b_y_center = (top + bot) / 2;
+                int b_x_center = (left + right) / 2;
+                int b_y_center = (top + bot) / 2;
                 //int b_width = right - left;
                 //int b_height = bot - top;
                 //sprintf(labelstr, "%d x %d - w: %d, h: %d", b_x_center, b_y_center, b_width, b_height);
 
-                float const font_size = show_img->rows / 1000.F;
-                cv::Size const text_size = cv::getTextSize(labelstr, cv::FONT_HERSHEY_COMPLEX_SMALL, font_size, 1, 0);
-                cv::Point pt1, pt2, pt_text, pt_text_bg1, pt_text_bg2;
-                pt1.x = left;
-                pt1.y = top;
-                pt2.x = right;
-                pt2.y = bot;
-                pt_text.x = left;
-                pt_text.y = top - 4;// 12;
-                pt_text_bg1.x = left;
-                pt_text_bg1.y = top - (3 + 18 * font_size);
-                pt_text_bg2.x = right;
-                if ((right - left) < text_size.width) pt_text_bg2.x = left + text_size.width;
-                pt_text_bg2.y = top;
-                cv::Scalar color;
-                color.val[0] = red * 256;
-                color.val[1] = green * 256;
-                color.val[2] = blue * 256;
+                if (point_in_polygon(roi_points, PT(b_x_center, b_y_center))) {
+                    float const font_size = show_img->rows / 1000.F;
+                    cv::Size const text_size = cv::getTextSize(labelstr, cv::FONT_HERSHEY_COMPLEX_SMALL, font_size, 1, 0);
+                    cv::Point pt1, pt2, pt_text, pt_text_bg1, pt_text_bg2;
+                    pt1.x = left;
+                    pt1.y = top;
+                    pt2.x = right;
+                    pt2.y = bot;
+                    pt_text.x = left;
+                    pt_text.y = top - 4;// 12;
+                    pt_text_bg1.x = left;
+                    pt_text_bg1.y = top - (3 + 18 * font_size);
+                    pt_text_bg2.x = right;
+                    if ((right - left) < text_size.width) pt_text_bg2.x = left + text_size.width;
+                    pt_text_bg2.y = top;
+                    cv::Scalar color;
+                    color.val[0] = red * 256;
+                    color.val[1] = green * 256;
+                    color.val[2] = blue * 256;
 
-                // you should create directory: result_img
-                //static int copied_frame_id = -1;
-                //static IplImage* copy_img = NULL;
-                //if (copied_frame_id != frame_id) {
-                //    copied_frame_id = frame_id;
-                //    if(copy_img == NULL) copy_img = cvCreateImage(cvSize(show_img->width, show_img->height), show_img->depth, show_img->nChannels);
-                //    cvCopy(show_img, copy_img, 0);
-                //}
-                //static int img_id = 0;
-                //img_id++;
-                //char image_name[1024];
-                //sprintf(image_name, "result_img/img_%d_%d_%d_%s.jpg", frame_id, img_id, class_id, names[class_id]);
-                //CvRect rect = cvRect(pt1.x, pt1.y, pt2.x - pt1.x, pt2.y - pt1.y);
-                //cvSetImageROI(copy_img, rect);
-                //cvSaveImage(image_name, copy_img, 0);
-                //cvResetImageROI(copy_img);
+                    // you should create directory: result_img
+                    //static int copied_frame_id = -1;
+                    //static IplImage* copy_img = NULL;
+                    //if (copied_frame_id != frame_id) {
+                    //    copied_frame_id = frame_id;
+                    //    if(copy_img == NULL) copy_img = cvCreateImage(cvSize(show_img->width, show_img->height), show_img->depth, show_img->nChannels);
+                    //    cvCopy(show_img, copy_img, 0);
+                    //}
+                    //static int img_id = 0;
+                    //img_id++;
+                    //char image_name[1024];
+                    //sprintf(image_name, "result_img/img_%d_%d_%d_%s.jpg", frame_id, img_id, class_id, names[class_id]);
+                    //CvRect rect = cvRect(pt1.x, pt1.y, pt2.x - pt1.x, pt2.y - pt1.y);
+                    //cvSetImageROI(copy_img, rect);
+                    //cvSaveImage(image_name, copy_img, 0);
+                    //cvResetImageROI(copy_img);
 
-                cv::rectangle(*show_img, pt1, pt2, color, width, 8, 0);
-                if (ext_output)
-                    printf("\t(left_x: %4.0f   top_y: %4.0f   width: %4.0f   height: %4.0f)\n",
-                    (float)left, (float)top, b.w*show_img->cols, b.h*show_img->rows);
-                else
-                    printf("\n");
+                    cv::rectangle(*show_img, pt1, pt2, color, width, 8, 0);
+                    if (ext_output)
+                        printf("\t(left_x: %4.0f   top_y: %4.0f   width: %4.0f   height: %4.0f)\n",
+                        (float)left, (float)top, b.w*show_img->cols, b.h*show_img->rows);
+                    else
+                        printf("\n");
 
-                cv::rectangle(*show_img, pt_text_bg1, pt_text_bg2, color, width, 8, 0);
-                cv::rectangle(*show_img, pt_text_bg1, pt_text_bg2, color, CV_FILLED, 8, 0);    // filled
-                cv::Scalar black_color = CV_RGB(0, 0, 0);
-                cv::putText(*show_img, labelstr, pt_text, cv::FONT_HERSHEY_COMPLEX_SMALL, font_size, black_color, 2 * font_size, CV_AA);
-                // cv::FONT_HERSHEY_COMPLEX_SMALL, cv::FONT_HERSHEY_SIMPLEX
+                    cv::rectangle(*show_img, pt_text_bg1, pt_text_bg2, color, width, 8, 0);
+                    cv::rectangle(*show_img, pt_text_bg1, pt_text_bg2, color, CV_FILLED, 8, 0);    // filled
+                    cv::Scalar black_color = CV_RGB(0, 0, 0);
+                    cv::putText(*show_img, labelstr, pt_text, cv::FONT_HERSHEY_COMPLEX_SMALL, font_size, black_color, 2 * font_size, CV_AA);
+                    // cv::FONT_HERSHEY_COMPLEX_SMALL, cv::FONT_HERSHEY_SIMPLEX
+                }
             }
         }
         if (ext_output) {
