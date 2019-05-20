@@ -853,7 +853,7 @@ void save_cv_jpg(mat_cv *img_src, const char *name)
 // Read points from a file that create (hopefully) simple polygon as ROI.
 // Bounding boxes will be shown only if they are strictly inside the ROI.
 
-static std::vector<cv::Point2f> roi_points;
+static std::vector<cv::Point> roi_points;
 
 void initialize_roi_points()
 {
@@ -866,7 +866,7 @@ void initialize_roi_points()
             roi_file >> x >> y;
             if (roi_file.fail()) break;
 
-            roi_points.push_back(cv::Point2f(x, y));
+            roi_points.push_back(cv::Point(x, y));
         }
 
         roi_file.close();
@@ -874,7 +874,7 @@ void initialize_roi_points()
     else throw std::logic_error("There are no roi.txt file");
 
     printf("ROI points: %d\n", (int) roi_points.size());
-    for (cv::Point2f p : roi_points) printf("%f %f\n", p.x, p.y);
+    for (cv::Point p : roi_points) printf("%f %f\n", p.x, p.y);
 }
 
 
@@ -958,13 +958,14 @@ void draw_detections_cv_v3(mat_cv* mat, detection *dets, int num, float thresh, 
                 if (top < 0) top = 0;
                 if (bot > show_img->rows - 1) bot = show_img->rows - 1;
 
+
                 int b_x_center = (left + right) / 2;
                 int b_y_center = (top + bot) / 2;
                 //int b_width = right - left;
                 //int b_height = bot - top;
                 //sprintf(labelstr, "%d x %d - w: %d, h: %d", b_x_center, b_y_center, b_width, b_height);
 
-                if (cv::pointPolygonTest(roi_points, cv::Point2f(b_x_center, b_y_center), false) >= 0) {
+                if (cv::pointPolygonTest(roi_points, cv::Point(b_x_center, b_y_center), false) >= 0) {
                     float const font_size = show_img->rows / 1000.F;
                     cv::Size const text_size = cv::getTextSize(labelstr, cv::FONT_HERSHEY_COMPLEX_SMALL, font_size, 1, 0);
                     cv::Point pt1, pt2, pt_text, pt_text_bg1, pt_text_bg2;
