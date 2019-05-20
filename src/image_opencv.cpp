@@ -891,6 +891,9 @@ void draw_detections_cv_v3(mat_cv* mat, detection *dets, int num, float thresh, 
         static int frame_id = 0;
         frame_id++;
 
+        // draw ROI border as polylines
+        cv::polylines(*show_img, roi_points, true, cv::Scalar(0, 255, 255), 2, cv::LINE_AA);
+
         for (i = 0; i < num; ++i) {
             char labelstr[4096] = { 0 };
             int class_id = -1;
@@ -957,8 +960,6 @@ void draw_detections_cv_v3(mat_cv* mat, detection *dets, int num, float thresh, 
                 if (right > show_img->cols - 1) right = show_img->cols - 1;
                 if (top < 0) top = 0;
                 if (bot > show_img->rows - 1) bot = show_img->rows - 1;
-
-                cv::polylines(*show_img, roi_points, true, cv::Scalar(0, 255, 255), 2, cv::LINE_AA);
 
                 int b_x_center = (left + right) / 2;
                 int b_y_center = (top + bot) / 2;
