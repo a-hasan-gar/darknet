@@ -853,7 +853,7 @@ void save_cv_jpg(mat_cv *img_src, const char *name)
 // Read points from a file that create (hopefully) simple polygon as ROI.
 // Bounding boxes will be shown only if they are strictly inside the ROI.
 
-static const std::vector<cv::Point2f> roi_points;
+static std::vector<cv::Point2f> roi_points;
 
 void initialize_roi_points()
 {
