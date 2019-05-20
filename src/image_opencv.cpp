@@ -847,6 +847,50 @@ void save_cv_jpg(mat_cv *img_src, const char *name)
 }
 // ----------------------------------------
 
+// ====================================================================
+// Region of Interest (ROI) Bounding Boxes
+// ====================================================================
+// Read points from a file that create (hopefully) simple polygon as ROI.
+// Bounding boxes will be shown only if they are strictly inside the ROI.
+
+const float PI = acos(-1.0);
+const float EPS = 1e-6;
+
+struct PT {
+    float x, y;
+    PT() {}
+    PT(float x, float y) : x(x), y(y) {}
+    PT(const PT &a, const PT &b) : x(b.x - a.x), y(b.y - a.y) {}
+    PT operator+ (const PT &p) const { return PT(x + p.x, y + p.y); }
+    PT operator- (const PT &p) const { return PT(x - p.x, y - p.y); }
+};
+
+float dot(PT p, PT q) { return p.x * q.x + p.y * q.y; }
+float dist2(PT p, PT q) { return dot(p - q, p - q); }
+float cross(PT p, PT q) { return p.x * q.y - p.y * q.x; }
+
+bool is_ccw(PT p, PT q, PT r) { return cross(PT(p, q), PT(p, r)) > 0; }
+
+float get_angle(PT a, PT o, PT b) { // return AOB in rad
+    PT oa = PT(o, a), ob = PT(o, b);
+    return acos(dot(oa, ob) / sqrt(dist2(oa, PT(0, 0)) * dist2(ob, PT(0, 0))));
+}
+
+bool point_in_polygon(const vector<PT> &polygon, PT p) {
+    float sum = 0;
+    for (int i = 0; i < (int) polygon.size(); i++) {
+        int next_idx = (i+1) % polygon.size();
+        float angle = get_angle(polygon[i], p, polygon[next_idx]);
+
+        if (is_ccw(p, polygon[i], polygon[(i+1)%polygon.size()]))
+            sum += angle;
+        else
+            sum -= angle;
+    }
+
+    return fabs(fabs(sum) - 2*PI) < EPS;
+}
+
 
 // ====================================================================
 // Draw Detection
