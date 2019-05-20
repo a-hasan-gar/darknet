@@ -956,10 +956,16 @@ void draw_detections_cv_v3(mat_cv* mat, detection *dets, int num, float thresh, 
                 //}
 
                 //printf("%d %s: %.0f%%\n", i, names[class_id], prob*100);
-                int offset = class_id * 123457 % classes;
-                float red = get_color(2, offset, classes);
-                float green = get_color(1, offset, classes);
-                float blue = get_color(0, offset, classes);
+                // int offset = class_id * 123457 % classes;
+                // float red = get_color(2, offset, classes);
+                // float green = get_color(1, offset, classes);
+                // float blue = get_color(0, offset, classes);
+
+                // if it is bus, color it green, else it's violator and color it red
+                float red = 0.0, green = 0.0, blue = 0.0;
+                if (strncmp(labelstr, "bus", 3)) blue = 1.0;
+                else red = 1.0;
+
                 float rgb[3];
 
                 //width = prob*20+2;

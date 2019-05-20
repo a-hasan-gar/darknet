@@ -8,7 +8,6 @@
 *.exe
 *.dll
 mnist/
-data/
 caffe/
 grasp/
 images/
@@ -37,3 +36,10 @@ Thumbs.db
 lib/
 include/
 share/
+
+# Result files
+out.avi
+predictions.jpg
+
+# Tests files
+tests/
