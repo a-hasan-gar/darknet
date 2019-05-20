@@ -899,9 +899,11 @@ void initialize_roi_points()
 
     std::ifstream roi_file("roi.txt");
     if (roi_file.is_open()) {
-        while (!roi_file.eof()) {
+        while (true) {
             PT p;
             roi_file >> p.x >> p.y;
+            if (roi_file.fail()) break;
+
             roi_points.push_back(p);
         }
 
