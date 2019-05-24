@@ -40,7 +40,7 @@ def get_region(vid_path):
     
     cv2.destroyWindow("image")
     cv2.imshow("image", image)
-    print("The detector will run on the selected region.")
+    print("The points have been printed on roi.txt")
     
     cv2.waitKey(5000)
     cv2.destroyWindow("image")
