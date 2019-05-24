@@ -52,10 +52,10 @@ def get_region(vid_path):
     return points
 
 def main():
-    if sys.argv[0] == 'roi':
-        get_region(sys.argv[1])
-    elif sys.argv[0] == 'detect':
-        subprocess.call("./darknet detector demo cfg/coco.data cfg/yolov3.cfgyolov3.weights {} -out_filename out.avi -dont_show -gpus 0,1,2 -thresh {}".format(sys.argv[1], sys.argv[2]), shell=True)
+    if sys.argv[1] == 'roi':
+        get_region(sys.argv[2])
+    elif sys.argv[1] == 'detect':
+        subprocess.call("./darknet detector demo cfg/coco.data cfg/yolov3.cfgyolov3.weights {} -out_filename out.avi -dont_show -gpus 0,1,2 -thresh {}".format(sys.argv[2], sys.argv[3]), shell=True)
     
 
 if __name__ == "__main__":
