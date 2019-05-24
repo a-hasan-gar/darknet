@@ -51,6 +51,7 @@ def get_region(vid_path):
     return points
 
 def main():
+    get_region(sys.argv[0])
     subprocess.call("./darknet detector demo cfg/coco.data cfg/yolov3.cfgyolov3.weights {} -out_filename out.avi -dont_show -gpus 0,1,2 -thresh {}".format(sys.argv[0], sys.argv[1]), shell=True)
     
 
