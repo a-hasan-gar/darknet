@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # import the necessary packages
 import subprocess
 import sys
