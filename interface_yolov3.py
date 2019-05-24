@@ -55,7 +55,7 @@ def main():
     if sys.argv[1] == 'roi':
         get_region(sys.argv[2])
     elif sys.argv[1] == 'detect':
-        subprocess.call("./darknet detector demo cfg/coco.data cfg/yolov3.cfgyolov3.weights {} -out_filename out.avi -dont_show -gpus 0,1,2 -thresh {}".format(sys.argv[2], sys.argv[3]), shell=True)
+        subprocess.call("./darknet detector demo cfg/coco.data cfg/yolov3.cfg yolov3.weights {} -out_filename out.avi -dont_show -gpus 0,1,2 -thresh {}".format(sys.argv[2], sys.argv[3]), shell=True)
     
 
 if __name__ == "__main__":
