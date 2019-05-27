@@ -1,0 +1,6 @@
+classes= 3
+train  = vehicle/dataset_train.txt
+valid  = vehicle/dataset_valid.txt
+names = vehicle/obj.names
+backup = backup/
+
